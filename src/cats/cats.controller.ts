@@ -1,24 +1,46 @@
-import { Controller, Get, HttpCode, Post, Query, Redirect, Req } from '@nestjs/common';
-import { Request } from 'express';
+import { Cat } from './interface/cat.interface';
+import { CatsService } from './cats.service';
+import { CreateCatDto, ListAllEntities, UpdateCatDto } from './dto/create-cat.dto';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Query, Res } from '@nestjs/common';
+import { Response } from 'express';
 
 @Controller('cats')
 export class CatsController {
-    @Get()
-    findAll(@Req() request: Request): string {
-        return 'This action return all cats';
+
+    constructor(private catService: CatsService) {
+
     }
 
     @Post()
-    @HttpCode(204)
-    create(): string {
-        return 'This action create a new cats';
+    create(@Body() createCatDto: CreateCatDto) {
+        this.catService.create(createCatDto);
+    }
+    // @Post()
+    // create(@Res() res: Response) {
+    //     return res.status(HttpStatus.CREATED).send();
+    // }
+
+    // @Get()
+    // findAll(@Query() query: ListAllEntities): string {
+    //     return `This action return all cats (limits: ${query.limit} items)`;
+    // }
+    @Get()
+    async findAll(): Promise<Cat []> {
+        return this.catService.findAll();
     }
 
-    @Get('docs')
-    @Redirect('https://docs.nestjs.com', 302)
-    getDocs(@Query('version') version) {
-        if (version && version === '5') {
-            return { url: 'https://docs.nestjs.com/v5/' }
-        }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return `This action returns a #${id} cat`;
+    }
+
+    @Put(':id')
+    update(@Param('id') id: string, @Body() updateCatDto: UpdateCatDto) {
+        return `This action updates a #${id} cat`;
+    }
+
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return `This action removes a #${id} cat`;
     }
 }
